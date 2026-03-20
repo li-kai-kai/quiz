@@ -86,6 +86,14 @@ function App() {
 
   const current = filtered[index]
 
+  useEffect(() => {
+    if (!current) {
+      setShowAnswer(false)
+      return
+    }
+    setShowAnswer(Boolean(progress.answers[current.uid]))
+  }, [current, progress.answers])
+
   const stats = useMemo(() => {
     const total = allQuestions.length
     const answered = Object.keys(progress.answers).length
@@ -145,7 +153,6 @@ function App() {
       return
     }
     setIndex((prev) => (prev + 1 >= filtered.length ? 0 : prev + 1))
-    setShowAnswer(false)
   }
 
   function prevQuestion() {
@@ -153,7 +160,6 @@ function App() {
       return
     }
     setIndex((prev) => (prev - 1 < 0 ? filtered.length - 1 : prev - 1))
-    setShowAnswer(false)
   }
 
   if (loading) {
