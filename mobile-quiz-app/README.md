@@ -1,16 +1,35 @@
-# React + Vite
+# 软考刷题 PWA
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 一键发布到 GitHub Pages
 
-Currently, two official plugins are available:
+### 方式 A：推送即自动发布（推荐）
+项目已内置工作流：
+- 文件：`.github/workflows/deploy-pages.yml`
+- 触发条件：推送到 `main` 分支，或手动触发 `workflow_dispatch`
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+首次使用请在仓库设置里确认：
+1. `Settings -> Pages -> Source` 选择 `GitHub Actions`
+2. 推送代码到 `main`
+3. 等待 Actions 成功后访问 Pages 地址
 
-## React Compiler
+### 方式 B：本地命令一键发布
+```bash
+npm run deploy
+```
+该命令会自动构建并把 `dist` 发布到 `gh-pages` 分支。
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 本地开发
+```bash
+npm install
+npm run dev -- --host
+```
 
-## Expanding the ESLint configuration
+## iPhone 离线使用
+1. 用 Safari 打开 GitHub Pages HTTPS 地址并完整加载一次。
+2. Safari 分享按钮 -> `添加到主屏幕`。
+3. 从主屏幕打开，断网可继续使用缓存题库。
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 关键脚本
+- `npm run build`：按 Pages 路径规则构建（`--base=./`）
+- `npm run build:pages`：同上
+- `npm run deploy`：本地一键发布到 `gh-pages` 分支

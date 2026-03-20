@@ -45,7 +45,8 @@ function App() {
   useEffect(() => {
     async function init() {
       try {
-        const res = await fetch('/questions_all.json')
+        const questionsUrl = `${import.meta.env.BASE_URL}questions_all.json`
+        const res = await fetch(questionsUrl)
         if (!res.ok) {
           throw new Error(`题库加载失败: ${res.status}`)
         }

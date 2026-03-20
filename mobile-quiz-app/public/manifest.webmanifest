@@ -1,0 +1,19 @@
+{
+  "name": "软考刷题",
+  "short_name": "软考刷题",
+  "description": "软考离线刷题应用",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f7ee",
+  "theme_color": "#2f6e3f",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
