@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 
 const PROGRESS_KEY = 'softexam-progress-v1'
+const VIEW_KEY = 'softexam-view-v1'
 
 function normalizeQuestions(raw) {
   return raw
@@ -32,14 +33,27 @@ function loadProgress() {
   }
 }
 
+function loadView() {
+  try {
+    const text = window.localStorage.getItem(VIEW_KEY)
+    if (!text) {
+      return { chapter: 'ALL', onlyWrong: false, currentUid: '' }
+    }
+    return { chapter: 'ALL', onlyWrong: false, currentUid: '', ...JSON.parse(text) }
+  } catch {
+    return { chapter: 'ALL', onlyWrong: false, currentUid: '' }
+  }
+}
+
 function App() {
+  const [initialView] = useState(loadView)
   const [allQuestions, setAllQuestions] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [chapter, setChapter] = useState('ALL')
-  const [index, setIndex] = useState(0)
+  const [chapter, setChapter] = useState(initialView.chapter)
+  const [currentUid, setCurrentUid] = useState(initialView.currentUid)
   const [showAnswer, setShowAnswer] = useState(false)
-  const [onlyWrong, setOnlyWrong] = useState(false)
+  const [onlyWrong, setOnlyWrong] = useState(Boolean(initialView.onlyWrong))
   const [progress, setProgress] = useState(loadProgress)
 
   useEffect(() => {
@@ -66,6 +80,10 @@ function App() {
     window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress))
   }, [progress])
 
+  useEffect(() => {
+    window.localStorage.setItem(VIEW_KEY, JSON.stringify({ chapter, onlyWrong, currentUid }))
+  }, [chapter, onlyWrong, currentUid])
+
   const chapters = useMemo(() => {
     const set = new Set(allQuestions.map((q) => q.chapter))
     return ['ALL', ...Array.from(set)]
@@ -80,11 +98,20 @@ function App() {
   }, [allQuestions, chapter, onlyWrong, progress.wrong])
 
   useEffect(() => {
-    setIndex(0)
-    setShowAnswer(false)
-  }, [chapter, onlyWrong])
+    if (!filtered.length) {
+      if (currentUid) {
+        setCurrentUid('')
+      }
+      setShowAnswer(false)
+      return
+    }
+    if (!filtered.some((q) => q.uid === currentUid)) {
+      setCurrentUid(filtered[0].uid)
+    }
+  }, [filtered, currentUid])
 
-  const current = filtered[index]
+  const index = filtered.findIndex((q) => q.uid === currentUid)
+  const current = filtered[index >= 0 ? index : 0]
 
   useEffect(() => {
     if (!current) {
@@ -152,14 +179,16 @@ function App() {
     if (!filtered.length) {
       return
     }
-    setIndex((prev) => (prev + 1 >= filtered.length ? 0 : prev + 1))
+    const nextIndex = index + 1 >= filtered.length ? 0 : index + 1
+    setCurrentUid(filtered[nextIndex].uid)
   }
 
   function prevQuestion() {
     if (!filtered.length) {
       return
     }
-    setIndex((prev) => (prev - 1 < 0 ? filtered.length - 1 : prev - 1))
+    const prevIndex = index - 1 < 0 ? filtered.length - 1 : index - 1
+    setCurrentUid(filtered[prevIndex].uid)
   }
 
   if (loading) {
