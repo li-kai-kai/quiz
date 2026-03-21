@@ -30,7 +30,7 @@ body {
   min-height: 100svh;
   max-width: 720px;
   margin: 0 auto;
-  padding: 10px 10px calc(108px + env(safe-area-inset-bottom));
+  padding: 10px 10px calc(94px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -125,10 +125,42 @@ body {
 .meta {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 8px;
   color: var(--sub);
   font-size: 12px;
   margin-bottom: 8px;
+}
+
+.meta-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f7fbf2;
+  color: var(--sub);
+}
+
+.icon-action svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.icon-action-active {
+  border-color: #8ab896;
+  background: #e8f4de;
+  color: var(--primary);
 }
 
 .card h2 {
@@ -191,19 +223,23 @@ body {
   background: rgba(255, 254, 249, 0.94);
   backdrop-filter: blur(14px);
   box-shadow: 0 -10px 26px rgba(31, 41, 25, 0.08);
+}
+
+.actions-primary {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 
-.actions button {
+.action-main {
   border: none;
   border-radius: 10px;
   background: var(--primary);
   color: white;
-  font-size: 14px;
-  padding: 10px;
-  min-height: 44px;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 12px;
+  min-height: 48px;
 }
 
 .footer {
@@ -233,11 +269,10 @@ body {
 
 @media (min-width: 768px) {
   .page {
-    padding: 18px 18px calc(104px + env(safe-area-inset-bottom));
+    padding: 18px 18px calc(96px + env(safe-area-inset-bottom));
   }
 
   .actions {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
     width: min(720px, calc(100vw - 36px));
     padding-left: 18px;
     padding-right: 18px;

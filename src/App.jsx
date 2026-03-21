@@ -281,7 +281,31 @@ function App() {
       <section className="card">
         <div className="meta">
           <span>{current.chapter}</span>
-          <span>{current.section}</span>
+          <div className="meta-actions">
+            <span>{current.section}</span>
+            <button
+              type="button"
+              className={`icon-action${favorite ? ' icon-action-active' : ''}`}
+              onClick={toggleFavorite}
+              aria-label={favorite ? '取消收藏' : '收藏'}
+              title={favorite ? '取消收藏' : '收藏'}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 17.3 5.8 20.6l1.2-7-5.1-5 7.1-1L12 1.2l3 6.4 7.1 1-5.1 5 1.2 7z" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className={`icon-action${showAnswer ? ' icon-action-active' : ''}`}
+              onClick={() => setShowAnswer((x) => !x)}
+              aria-label={showAnswer ? '隐藏解析' : '查看解析'}
+              title={showAnswer ? '隐藏解析' : '查看解析'}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5c5.5 0 9.7 4.7 10.8 6-1.1 1.3-5.3 6-10.8 6S2.3 12.3 1.2 11C2.3 9.7 6.5 5 12 5zm0 2.5A3.5 3.5 0 1 0 12 14.5 3.5 3.5 0 0 0 12 7.5z" />
+              </svg>
+            </button>
+          </div>
         </div>
         <h2>{current.id}. {current.stem}</h2>
         <div className="options">
@@ -313,10 +337,10 @@ function App() {
       </section>
 
       <section className="actions">
-        <button onClick={prevQuestion}>上一题</button>
-        <button onClick={toggleFavorite}>{favorite ? '取消收藏' : '收藏'}</button>
-        <button onClick={() => setShowAnswer((x) => !x)}>{showAnswer ? '隐藏解析' : '查看解析'}</button>
-        <button onClick={nextQuestion}>下一题</button>
+        <div className="actions-primary">
+          <button className="action-main" onClick={prevQuestion}>上一题</button>
+          <button className="action-main" onClick={nextQuestion}>下一题</button>
+        </div>
       </section>
 
       <footer className="footer">
