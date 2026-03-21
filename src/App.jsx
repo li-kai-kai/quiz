@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 
 const PROGRESS_KEY = 'softexam-progress-v1'
-const VIEW_KEY = 'softexam-view-v1'
 
 function normalizeQuestions(raw) {
   return raw
@@ -33,20 +32,37 @@ function loadProgress() {
   }
 }
 
-function loadView() {
-  try {
-    const text = window.localStorage.getItem(VIEW_KEY)
-    if (!text) {
-      return { chapter: 'ALL', onlyWrong: false, currentUid: '' }
-    }
-    return { chapter: 'ALL', onlyWrong: false, currentUid: '', ...JSON.parse(text) }
-  } catch {
-    return { chapter: 'ALL', onlyWrong: false, currentUid: '' }
+function loadViewFromUrl() {
+  const params = new URLSearchParams(window.location.search)
+  return {
+    chapter: params.get('chapter') || 'ALL',
+    onlyWrong: params.get('wrong') === '1',
+    currentUid: params.get('q') || '',
   }
 }
 
+function syncViewToUrl({ chapter, onlyWrong, currentUid }) {
+  const params = new URLSearchParams()
+  if (chapter && chapter !== 'ALL') {
+    params.set('chapter', chapter)
+  }
+  if (onlyWrong) {
+    params.set('wrong', '1')
+  }
+  if (currentUid) {
+    params.set('q', currentUid)
+  }
+
+  const query = params.toString()
+  const nextUrl = query
+    ? `${window.location.pathname}?${query}${window.location.hash}`
+    : `${window.location.pathname}${window.location.hash}`
+
+  window.history.replaceState(null, '', nextUrl)
+}
+
 function App() {
-  const [initialView] = useState(loadView)
+  const [initialView] = useState(loadViewFromUrl)
   const [allQuestions, setAllQuestions] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -81,13 +97,19 @@ function App() {
   }, [progress])
 
   useEffect(() => {
-    window.localStorage.setItem(VIEW_KEY, JSON.stringify({ chapter, onlyWrong, currentUid }))
+    syncViewToUrl({ chapter, onlyWrong, currentUid })
   }, [chapter, onlyWrong, currentUid])
 
   const chapters = useMemo(() => {
     const set = new Set(allQuestions.map((q) => q.chapter))
     return ['ALL', ...Array.from(set)]
   }, [allQuestions])
+
+  useEffect(() => {
+    if (allQuestions.length && chapter !== 'ALL' && !chapters.includes(chapter)) {
+      setChapter('ALL')
+    }
+  }, [allQuestions.length, chapter, chapters])
 
   const filtered = useMemo(() => {
     const chapterFiltered = chapter === 'ALL' ? allQuestions : allQuestions.filter((q) => q.chapter === chapter)
