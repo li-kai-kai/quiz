@@ -115,6 +115,32 @@ body {
   gap: 6px;
 }
 
+.toolbar {
+  display: flex;
+  gap: 8px;
+}
+
+.action-secondary {
+  flex: 1;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.action-secondary:disabled {
+  opacity: 0.45;
+}
+
+.action-danger {
+  border-color: #e7c1bb;
+  color: var(--wrong);
+  background: #fff5f3;
+}
+
 .card {
   background: var(--surface);
   border: 1px solid var(--line);

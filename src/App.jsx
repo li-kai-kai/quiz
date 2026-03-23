@@ -32,6 +32,14 @@ function loadProgress() {
   }
 }
 
+function resetPracticeProgress(prev) {
+  return {
+    ...prev,
+    answers: {},
+    wrong: {},
+  }
+}
+
 function loadViewFromUrl() {
   const params = new URLSearchParams(window.location.search)
   return {
@@ -120,6 +128,9 @@ function App() {
   }, [allQuestions, chapter, onlyWrong, progress.wrong])
 
   useEffect(() => {
+    if (loading) {
+      return
+    }
     if (!filtered.length) {
       if (currentUid) {
         setCurrentUid('')
@@ -130,7 +141,7 @@ function App() {
     if (!filtered.some((q) => q.uid === currentUid)) {
       setCurrentUid(filtered[0].uid)
     }
-  }, [filtered, currentUid])
+  }, [filtered, currentUid, loading])
 
   const index = filtered.findIndex((q) => q.uid === currentUid)
   const current = filtered[index >= 0 ? index : 0]
@@ -140,8 +151,8 @@ function App() {
       setShowAnswer(false)
       return
     }
-    setShowAnswer(Boolean(progress.answers[current.uid]))
-  }, [current, progress.answers])
+    setShowAnswer(onlyWrong ? false : Boolean(progress.answers[current.uid]))
+  }, [current, onlyWrong, progress.answers])
 
   const stats = useMemo(() => {
     const total = allQuestions.length
@@ -197,6 +208,32 @@ function App() {
     })
   }
 
+  function restartCurrentQuestion() {
+    if (!current) {
+      return
+    }
+    setProgress((prev) => {
+      if (!prev.answers[current.uid]) {
+        return prev
+      }
+      const answers = { ...prev.answers }
+      delete answers[current.uid]
+      return {
+        ...prev,
+        answers,
+      }
+    })
+    setShowAnswer(false)
+  }
+
+  function restartProgress() {
+    if (!window.confirm('重新开始会清空当前刷题记录和错题本，是否继续？')) {
+      return
+    }
+    setProgress((prev) => resetPracticeProgress(prev))
+    setShowAnswer(false)
+  }
+
   function nextQuestion() {
     if (!filtered.length) {
       return
@@ -244,12 +281,16 @@ function App() {
             只看错题
           </label>
         </section>
+        <section className="toolbar">
+          <button type="button" className="action-secondary" onClick={restartProgress}>重新开始</button>
+        </section>
         <p className="state">当前筛选下没有题目</p>
       </main>
     )
   }
 
   const userAnswer = progress.answers[current.uid]
+  const visibleAnswer = onlyWrong && !showAnswer ? null : userAnswer
   const favorite = !!progress.favorites[current.uid]
 
   return (
@@ -276,6 +317,20 @@ function App() {
           <input type="checkbox" checked={onlyWrong} onChange={(e) => setOnlyWrong(e.target.checked)} />
           只看错题
         </label>
+      </section>
+
+      <section className="toolbar">
+        <button
+          type="button"
+          className="action-secondary"
+          onClick={restartCurrentQuestion}
+          disabled={!userAnswer}
+        >
+          重做本题
+        </button>
+        <button type="button" className="action-secondary action-danger" onClick={restartProgress}>
+          重新开始
+        </button>
       </section>
 
       <section className="card">
@@ -310,7 +365,7 @@ function App() {
         <h2>{current.id}. {current.stem}</h2>
         <div className="options">
           {Object.entries(current.options).map(([key, text]) => {
-            const selected = userAnswer?.selected === key
+            const selected = visibleAnswer?.selected === key
             const isCorrect = current.answer === key
             let cls = 'option'
             if (showAnswer && isCorrect) {
